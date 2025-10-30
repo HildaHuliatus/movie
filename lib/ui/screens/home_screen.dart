@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:movie/ui/widgets/movie_list.dart';
 import 'package:movie/ui/widgets/movie_list_popular.dart';
 import 'package:movie/ui/widgets/movie_list_top.dart';
@@ -12,70 +12,102 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+
+  
+  final List<String> imagePaths = [
+    'assets/images/kucing.jpg',
+    'assets/images/great.jpg',
+    'assets/images/great.jpg',
+  ];
+
   @override
   Widget build(BuildContext context) {
-    
-    List<Container> cards = [
-      Container(
-        alignment: Alignment.center,
-        child: Image(
-          fit: BoxFit.cover,
-          image: AssetImage( 
-            'assets/images/kucing.jpg',
-          ),
-        ),
-      ),
-      Container(
-        alignment: Alignment.center,
-        child: Image(
-          fit: BoxFit.cover,
-          image: AssetImage( 
-            'assets/images/great.jpg',
-          ),
-        ),
-      ),
-      Container(
-        alignment: Alignment.center,
-        child: Image(
-          fit: BoxFit.cover,
-          image: AssetImage( 
-            'assets/images/dark.jpg', 
-          ),
-        ),
-      )
-    ];
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            
             Container(
               height: 80,
-              color: const Color.fromARGB(255, 3, 3, 3),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+              color: Colors.black,
+              alignment: Alignment.center,
+              child: const Text(
+                'Now Playing',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+
+            Container(
+              color: Colors.black,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Column(
                 children: [
-                  Text('Now Playing',
-                      style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white)),
+                  CarouselSlider.builder(
+                    itemCount: imagePaths.length,
+                    itemBuilder: (context, index, realIndex) {
+                      final imagePath = imagePaths[index];
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          imagePath,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        ),
+                      );
+                    },
+                    options: CarouselOptions(
+                      height: 300,
+                      enlargeCenterPage: true,
+                      autoPlay: true,
+                      autoPlayInterval: const Duration(seconds: 3),
+                      autoPlayAnimationDuration:
+                          const Duration(milliseconds: 800),
+                      viewportFraction: 0.9,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                      },
+                    ),
+                  ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: imagePaths.asMap().entries.map((entry) {
+                      return GestureDetector(
+                        onTap: () => setState(() {
+                          _currentIndex = entry.key;
+                        }),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: _currentIndex == entry.key ? 12.0 : 8.0,
+                          height: _currentIndex == entry.key ? 12.0 : 8.0,
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 4.0),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _currentIndex == entry.key
+                                ? Colors.white
+                                : Colors.grey,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ],
               ),
             ),
-            Container(
-              height: 300,
-              color: const Color.fromARGB(255, 3, 3, 3),
-              child: CardSwiper(
-                cardsCount: cards.length,
-                cardBuilder: (context, index, percentThresholdX, percentThresholdY) => cards[index],
-              ),
-            ),
-            MovieList(),
-            MovieListPopular(),
-            MovieListTop()
+
+            
+            const MovieList(),
+            const MovieListPopular(),
+            const MovieListTop(),
           ],
         ),
       ),
