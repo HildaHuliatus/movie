@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Image(
           fit: BoxFit.cover,
           image: AssetImage( 
-            'assets/images/dark.jpg', // 💡 Recommend replacing the duplicated path
+            'assets/images/dark.jpg', 
           ),
         ),
       )
